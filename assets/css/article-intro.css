@@ -1,0 +1,47 @@
+/* The scene fills the title area while remaining behind every link and word */
+.reading-shell { position: relative; z-index: 1; }
+.article-header { position: relative; isolation: isolate; }
+.article-intro {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  width: min(1440px, calc(100vw - 32px));
+  height: 100%;
+  min-height: 320px;
+  transform: translateX(-50%);
+  overflow: hidden;
+  color: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: article-intro-lifetime var(--article-intro-duration) ease-in-out both;
+}
+.article-intro__stars { fill: currentColor; opacity: .58; }
+.article-intro__galaxy { transform-origin: 50% 48.8%; transform-box: view-box; animation: article-galaxy-turn var(--article-intro-duration) linear both; }
+.article-intro__arms { fill: currentColor; opacity: .42; }
+.article-intro__orbit { fill: none; stroke: currentColor; stroke-width: .6; opacity: .22; }
+.article-intro__core { fill: currentColor; opacity: .4; }
+
+/* The warmer sun and cool crescent give the wide scene two quiet anchors */
+.article-intro__sun { color: #e8bd77; }
+.article-intro__sun-body { fill: currentColor; opacity: .8; }
+.article-intro__sun-ring { fill: none; stroke: currentColor; stroke-width: .8; opacity: .55; }
+.article-intro__rays { fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; opacity: .8; }
+.article-intro__moon { fill: currentColor; opacity: .9; }
+.article-intro__moon-orbit { fill: none; stroke: currentColor; stroke-width: .8; opacity: .4; }
+[data-theme="light"] .article-intro__sun { color: #a66c21; }
+
+/* Streaks cross the scene once and finish before the background fades */
+.article-intro__shooting-star { fill: currentColor; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; opacity: 0; transform-box: view-box; }
+.article-intro__shooting-star path { stroke-opacity: .6; }
+.article-intro__shooting-star--one { animation: article-intro-shoot 1.8s ease-out 1.7s both; }
+.article-intro__shooting-star--two { animation: article-intro-shoot 1.7s ease-out 3.8s both; }
+.article-intro__shooting-star--three { animation: article-intro-shoot 1.6s ease-out 6s both; }
+.article-intro__spark { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; opacity: 0; animation: article-intro-twinkle 2.4s ease-in-out 2.5s 2 both; }
+
+@keyframes article-intro-lifetime { 0% { opacity: 0; } 27%, 65% { opacity: .85; } 100% { opacity: 0; } }
+@keyframes article-galaxy-turn { from { transform: rotate(-14deg); } to { transform: rotate(30deg); } }
+@keyframes article-intro-shoot { 0% { opacity: 0; transform: translate(0, 0); } 18% { opacity: 1; } 85%, 100% { opacity: 0; transform: translate(-180px, 108px); } }
+@keyframes article-intro-twinkle { 0%, 100% { opacity: 0; } 40% { opacity: .8; } 70% { opacity: .25; } }
+@media (max-width: 680px) { .article-intro { width: calc(100vw - 16px); min-height: 330px; } }
+@media (prefers-reduced-motion: reduce) { .article-intro { display: none; animation: none; } }

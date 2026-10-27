@@ -1,0 +1,31 @@
+# Dependencies and generated output are rebuilt from the source and Bun lockfile
+node_modules/
+dist/
+coverage/
+.cache/
+.vite/
+.vite-temp/
+/*.zip
+/tmp/
+
+# Local settings and credentials never belong in a public site repository
+.env
+.env.*
+!.env.example
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.log
+
+# The terminal renderer and Python asset tools create disposable working files
+src/terminal/.terminal-ssr-*.mjs
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Local verification and measurements stay outside the public source repository
+/tests/
+/benchmarks/

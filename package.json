@@ -1,0 +1,25 @@
+{
+  "name": "locainin-personal-site",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "ripple": "0.4.7"
+  },
+  "devDependencies": {
+    "@ripple-ts/vite-plugin": "0.4.7",
+    "happy-dom": "21.0.4",
+    "vite": "8.3.5"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "render:stego": "python3 scripts/stego/render.py && bun run encode:animations inplainsight",
+    "render:proton": "python3 scripts/proton/render.py && bun run encode:animations protoninformer",
+    "encode:animations": "node scripts/media/encode-animations.mjs",
+    "preview": "vite preview"
+  },
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="locainin — Linux desktop tools, systems programming, and a notebook for everything learned along the way.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0c0e14">
+  <title>locainin / software &amp; notes</title>
+  <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/home.css">
+  <link rel="stylesheet" href="assets/css/projects.css">
+  <link rel="stylesheet" href="assets/css/notification.css">
+  <link rel="stylesheet" href="assets/css/terminal.css">
+  <link rel="preload" href="assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/plex-mono-semibold.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- theme-init -->
+  <script type="module" src="assets/js/motion.js"></script>
+  <script type="module" src="src/terminal/main.mjs"></script>
+  <script type="module" src="src/media/main.mjs"></script>
+  <script type="module" src="src/notifications/main.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <!-- shared-header -->
+
+  <main id="main" tabindex="-1">
+    <section class="intro-section" aria-labelledby="intro-title">
+      <div class="hero-layout shell">
+        <div class="hero">
+          <p class="intro-kicker"><span aria-hidden="true">✳</span> A personal corner of the internet</p>
+          <div id="terminal-root"><!-- terminal-intro --></div>
+          <noscript><p class="nojs-note nojs-feature-note">no javascript. the train gets a day off :)</p></noscript>
+          <div class="intro-links"><a href="articles/">Read something <span aria-hidden="true">↓</span></a><a class="mobile-project-jump" href="#projects">See projects <span aria-hidden="true">↓</span></a><a class="source-link" href="https://github.com/locainin">Find the source <span aria-hidden="true">↗</span></a></div>
+        </div>
+        <aside class="off-clock" id="off-clock" aria-label="Off the clock">
+          <div class="channel-note"><span aria-hidden="true">↙</span></div>
+          <!-- no-script-note -->
+          <figure class="media-window dance-window" data-media-loop>
+            <div class="media-titlebar"><span><span class="live-dot" aria-hidden="true"></span> off-the-clock.mp4</span><span aria-hidden="true">– &nbsp; □ &nbsp; ×</span></div>
+            <video src="assets/media/after-hours.mp4" poster="assets/media/after-hours.webp" width="640" height="360" controls muted loop playsinline preload="none" aria-label="The full anime dance video from the personal media collection">An anime dance video</video>
+            <figcaption><span>zero productivity. excellent vibes.</span><button type="button" data-loop-toggle hidden>Play loop</button></figcaption>
+          </figure>
+          <p class="channel-sticker" aria-hidden="true">KEEP THIS TAB OPEN ↗</p>
+        </aside>
+      </div>
+
+    </section>
+
+    <section class="notebook" id="articles" aria-labelledby="articles-title">
+      <div class="notebook-layout shell">
+        <header class="notes-heading">
+          <p class="section-index">01 / The notebook</p>
+          <h2 id="articles-title">Articles<span>&amp; other tangents.</span></h2>
+          <p class="notebook-intro">Things learned, things made,<br>things worth keeping.</p>
+          <figure class="sky-window" data-media-loop>
+            <video src="assets/media/sky-loop.mp4" poster="assets/media/sky-loop.webp" width="400" height="224" controls muted loop playsinline preload="none" aria-label="Rei Ayanami under a blue sky, from the personal GIF collection">Rei Ayanami under a blue sky</video>
+            <figcaption><span>no thoughts, just sky.</span><button type="button" data-loop-toggle hidden>Play loop</button></figcaption>
+          </figure>
+        </header>
+        <div class="notebook-entries">
+          <!-- homepage-writing -->
+          <a class="archive-link notebook-cta" href="articles/">All articles <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="projects-section shell" id="projects" aria-labelledby="projects-title">
+      <header class="projects-heading reveal">
+        <div><p class="section-index">02 / Open source</p><h2 id="projects-title">Projects<span aria-hidden="true">/</span></h2></div>
+      </header>
+      <!-- homepage-projects -->
+    </section>
+  </main>
+  <footer class="site-footer shell"><span>© 2026 locainin <span class="footer-aside">/ still figuring things out</span></span><a class="back-top" href="#intro-title">Back to the prompt <span aria-hidden="true">↑</span></a></footer>
+</body>
+</html>
