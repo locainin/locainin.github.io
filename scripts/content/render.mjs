@@ -87,10 +87,11 @@ function renderProjectCopy(project, index, options = {}) {
     element = 'div',
     heading = 'h3',
     className = 'project-copy',
-    href = `${githubBase}${encodeURIComponent(project.repository)}`,
     archiveLink = false,
     showNumber = true,
+    showStack = true,
   } = options;
+  const href = `${githubBase}${encodeURIComponent(project.repository)}`;
   const label = showNumber
     ? `${String(index + 1).padStart(2, '0')} / ${project.category}`
     : project.category;
@@ -103,18 +104,17 @@ function renderProjectCopy(project, index, options = {}) {
     <span class="project-index">${escapeHtml(label)}</span>
     <${heading}>${escapeHtml(project.title)}</${heading}>
     <p>${escapeHtml(project.description)}</p>
-    <span class="project-stack">${stackLabel(project.stack)}</span>
+    ${showStack ? `<span class="project-stack">${stackLabel(project.stack)}</span>` : ''}
     ${note}
     ${link}
   </${element}>`;
 }
 
 function renderFeaturedProject(project, index) {
-  const repositoryUrl = `${githubBase}${encodeURIComponent(project.repository)}`;
   if (project.home === 'notifications') {
     return `<article class="project">
       <div class="project-feature-link">
-        ${renderProjectCopy(project, index, { element: 'a', href: repositoryUrl })}
+        ${renderProjectCopy(project, index, { element: 'a' })}
         ${renderNotificationPreview()}
       </div>
     </article>`;
@@ -122,7 +122,7 @@ function renderFeaturedProject(project, index) {
 
   return `<article class="project">
     <div class="project-feature-link">
-      ${renderProjectCopy(project, index, { element: 'a', href: repositoryUrl })}
+      ${renderProjectCopy(project, index, { element: 'a' })}
       ${renderProjectAnimation(project, '', 'project-visual stego-demo')}
     </div>
   </article>`;
@@ -131,18 +131,12 @@ function renderFeaturedProject(project, index) {
 function renderHomepageProjects() {
   const featured = projects.filter((project) => ['notifications', 'stego'].includes(project.home));
   const moreProject = projects.find((project) => project.home === 'more');
-  const repositoryUrl = `${githubBase}${encodeURIComponent(moreProject.repository)}`;
   return `<p class="project-group-label">Featured projects</p>
     <div class="project-features">${featured.map(renderFeaturedProject).join('')}</div>
     <p class="project-group-label project-group-label--more">More projects</p>
     <div class="project-continuation">
       <article class="project project-more-entry">
-        <div>
-          <span class="project-index">03 / ${escapeHtml(moreProject.category)}</span>
-          <h3>${escapeHtml(moreProject.title)}</h3>
-          <p>${escapeHtml(moreProject.description)}</p>
-          <a class="project-source" href="${repositoryUrl}">View repository <span aria-hidden="true">↗</span></a>
-        </div>
+        ${renderProjectCopy(moreProject, featured.length, { element: 'a', showStack: false })}
         ${renderProjectAnimation(moreProject, '', 'project-animation proton-demo')}
       </article>
       <a class="project-directory-link" href="projects/">

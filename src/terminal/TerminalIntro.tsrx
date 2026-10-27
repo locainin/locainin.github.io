@@ -32,7 +32,10 @@ export function TerminalIntro({ animate = false, interactive = false }: { animat
     response.value = null;
     mode.value = 'static';
   };
-  const restart = () => {
+  const restart = (event: MouseEvent) => {
+    const button = event.currentTarget as HTMLElement;
+    // Keep the keyboard position when the focused control is replaced
+    if (document.activeElement === button) (button.closest('.terminal-window') as HTMLElement).focus();
     response.value = null;
     line.value = '';
     elapsed.value = 0;
@@ -47,7 +50,11 @@ export function TerminalIntro({ animate = false, interactive = false }: { animat
     effect(() => {
       const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
       const changed = (event: MediaQueryListEvent) => {
-        if (event.matches) mode.value = 'static';
+        if (!event.matches) return;
+        const control = document.activeElement;
+        // Preserve focus before reduced motion removes the animation controls
+        if (control?.matches('.terminal-pause, .terminal-skip')) (control.closest('.terminal-window') as HTMLElement).focus();
+        mode.value = 'static';
       };
       preference.addEventListener('change', changed);
       return () => preference.removeEventListener('change', changed);
