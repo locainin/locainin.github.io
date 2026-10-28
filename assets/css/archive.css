@@ -139,7 +139,7 @@
 }
 
 .archive-excerpt { margin-top: 6px; color: var(--muted); font: 16px/1.6 var(--sans); }
-.archive-article-meta { display: flex; align-items: center; justify-content: flex-end; gap: 16px; color: var(--metadata); font: 12px/1.6 var(--mono); white-space: nowrap; }
+.archive-article-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 16px; color: var(--metadata); font: 12px/1.6 var(--mono); }
 .archive-article--coming-soon .archive-article-meta > span:first-child { color: var(--accent); }
 .archive-arrow { color: var(--accent); font: 21px/1 var(--sans); transition: transform 160ms ease; }
 

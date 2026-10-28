@@ -1,55 +1,53 @@
 /* Shell chrome stays compact while the name carries the visual weight */
-.terminal-window { overflow: hidden; background: var(--terminal-bg); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 18px 50px #0002; }
+.terminal-window { container-type: inline-size; overflow: hidden; background: var(--terminal-bg); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 18px 50px #0002; }
+/* Programmatic focus stays available without outlining the whole terminal */
 .terminal-window:focus { outline: none; }
-.terminal-titlebar { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 42px; padding-inline: 17px 8px; background: var(--surface); border-bottom: 1px solid var(--line); font: 10px/1.6 var(--mono); color: var(--muted); }
+.terminal-titlebar { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding-inline: 17px 8px; background: var(--surface); border-bottom: 1px solid var(--line); font: var(--font-xs)/1.6 var(--mono); color: var(--muted); }
 .terminal-title { display: flex; align-items: center; gap: 12px; }
 .window-dots { display: flex; gap: 6px; }
 .window-dots i { display: block; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: .45; }
 .window-dots i:first-child { background: var(--pink); opacity: .9; }
-.terminal-action { display: flex; justify-content: flex-end; align-items: center; min-width: 90px; min-height: 42px; }
-.terminal-control { min-height: 42px; border: 0; background: transparent; padding-inline: 8px; font: 10px var(--mono); }
+.terminal-action { display: flex; justify-content: flex-end; align-items: center; min-height: 50px; }
+.terminal-control { min-height: 44px; min-width: 44px; margin: 3px; border: 0; background: transparent; padding-inline: 8px; font: var(--font-xs) var(--mono); }
 .terminal-control:hover { color: var(--accent); }
-.terminal-control span { margin-left: 8px; color: var(--accent); }
-.terminal-body { position: relative; height: 320px; overflow: hidden; padding: 20px 26px; font-family: var(--mono); }
-.terminal-command { display: flex; align-items: baseline; gap: 12px; min-height: 24px; font-size: 13px; line-height: 1.7; white-space: pre; }
+.terminal-body { position: relative; height: 20rem; overflow-x: hidden; overflow-y: auto; padding: 1.25rem 1.625rem; font-family: var(--mono); }
+/* Interactive replies grow naturally while the animation keeps a steady stage */
+.terminal-window[data-mode="prompt"] .terminal-body { height: auto; min-height: 20rem; overflow: visible; }
+.terminal-command { display: flex; align-items: baseline; gap: 12px; min-height: 24px; font-size: var(--font-sm); line-height: 1.7; white-space: pre-wrap; }
+.terminal-command > span { min-width: 0; }
 .prompt-symbol { color: var(--pink); font-weight: 600; }
-.name-output { min-height: 90px; margin: 6px 0 8px; font: 600 14px/18px var(--mono); letter-spacing: 0; }
+.name-output { min-height: 90px; margin: 6px 0 8px; font: 600 min(.875rem, 3.7cqw)/1.3 var(--mono); letter-spacing: 0; }
 .typed-name { white-space: pre; }
 /* Text underscores blink during typing and remain at the idle prompt */
 .terminal-cursor, .resting-cursor { color: var(--accent); font-weight: 600; animation: cursor-blink 1.1s step-end infinite; }
 .terminal-command .terminal-cursor { margin-left: -10px; }
-.about-output { min-height: 48px; margin-top: 8px; font: 14px/1.7 var(--mono); color: var(--muted); white-space: pre-line; transition: opacity 150ms; }
+.about-output { min-height: 48px; margin-top: 8px; font: var(--font-sm)/1.7 var(--mono); color: var(--muted); white-space: pre-line; transition: opacity 150ms; }
 .terminal-prompt { display: flex; align-items: baseline; min-height: 22px; gap: 12px; margin-top: 12px; font-size: 15px; }
 /* The idle cursor becomes a native caret when the optional prompt has focus */
 .prompt-entry { position: relative; flex: 1; min-width: 0; }
-.terminal-input { display: block; width: 100%; min-height: 26px; padding: 2px 0; border: 0; border-radius: 0; background: transparent; color: var(--text); caret-color: var(--accent); font: 12px/1.8 var(--mono); }
-.terminal-input::placeholder { color: transparent; }
-.terminal-input:focus::placeholder { color: var(--muted); }
+.terminal-input { display: block; width: 100%; min-height: 44px; padding: 2px 0; border: 0; border-radius: 0; background: transparent; color: var(--text); caret-color: var(--accent); font: var(--font-sm)/1.8 var(--mono); }
+/* The native caret marks command entry without drawing a box around the prompt */
 .terminal-input:focus-visible { outline: none; }
-.prompt-entry:focus-within { box-shadow: 0 1px var(--accent); }
-.prompt-entry .resting-cursor { position: absolute; left: 0; top: 0; pointer-events: none; }
+.prompt-entry .resting-cursor { position: absolute; left: 0; top: 8px; pointer-events: none; }
 .prompt-entry:focus-within .resting-cursor, .terminal-input:not(:placeholder-shown) + .resting-cursor { display: none; }
-.prompt-help { flex-shrink: 0; color: var(--muted); font: 9px/1.8 var(--mono); }
 .prompt-submit { display: none; }
 /* A single answer keeps exploration contained inside the terminal */
-.terminal-response { max-height: 72px; overflow-y: auto; overflow-wrap: anywhere; margin-top: 8px; padding-block: 8px 1px; border-top: 1px dashed var(--line); color: var(--muted); font: 11px/1.8 var(--mono); }
+.terminal-response { margin-top: 8px; padding-block: 8px 1px; border-top: 1px dashed var(--line); color: var(--muted); font: var(--font-sm)/1.8 var(--mono); }
 .terminal-response p { white-space: pre-line; }
+.terminal-response[data-format="long"] p { white-space: pre-wrap; }
 .terminal-directory { display: flex; flex-wrap: wrap; gap: 5px 18px; margin-top: 7px; }
 .terminal-directory a { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
 .terminal-directory a:hover { color: var(--pink); }
+.terminal-directory[data-format="long"] { flex-direction: column; align-items: flex-start; }
+.terminal-directory[data-format="long"] a { white-space: pre-wrap; }
 [data-visible="false"] { opacity: 0; }
 @media (max-width: 680px) {
-  .terminal-titlebar { padding-inline: 12px 6px; font-size: 9px; }
+  .terminal-titlebar { padding-inline: 12px 6px; }
   .terminal-title { gap: 10px; }
-  .terminal-action { min-width: 80px; }
-  .terminal-body { padding: 22px 18px; }
-  .terminal-command { font-size: 11px; }
-  .name-output { min-height: 70px; font-size: 10px; line-height: 14px; }
-  .about-output { font-size: 12px; min-height: 48px; }
+  .terminal-body { padding: 1.375rem 1.125rem; }
+  .name-output { min-height: 70px; }
   /* The arrow also submits commands when a hardware keyboard is absent */
   .terminal-prompt { align-items: center; gap: 10px; }
-  .prompt-entry .resting-cursor { top: 8px; }
-  .prompt-help { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .prompt-submit { display: grid; place-items: center; flex: 0 0 44px; height: 44px; padding: 0; border: 0; background: transparent; color: var(--accent); font: 20px var(--mono); }
 }
 
@@ -62,14 +60,12 @@
 
 /* Fit all 80 train columns to the terminal rather than cropping the phone view */
 @media (max-width: 850px) {
-  .terminal-window { container-type: inline-size; }
   .terminal-train pre { font-size: min(11px, 2.05cqw); line-height: 1.36; }
 }
 
 /* Touch sizing also applies to tablets without changing pointer-based desktop layouts */
 @media (max-width: 680px), (pointer: coarse) {
-  .terminal-control { min-height: 44px; min-width: 44px; font-size: 11px; }
-  .terminal-input { min-height: 44px; font-size: 16px; }
+  .terminal-input { font-size: var(--font-base); }
   .terminal-directory { gap: 0 18px; }
   .terminal-directory a { display: inline-flex; align-items: center; min-height: 44px; }
 }

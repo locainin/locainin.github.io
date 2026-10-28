@@ -35,6 +35,7 @@ function renderProjectAnimation(project, rootHref, className) {
     <video data-project-video src="${rootHref}${escapeHtml(video)}" width="${width}" height="${height}" poster="${rootHref}${escapeHtml(poster)}" muted loop playsinline preload="none" hidden aria-hidden="true"></video>
     <picture>
       <source media="(prefers-reduced-motion: reduce)" srcset="${rootHref}${escapeHtml(poster)}">
+      <source media="(scripting: enabled)" srcset="${rootHref}${escapeHtml(poster)}">
       <img src="${rootHref}${escapeHtml(animation)}" width="${width}" height="${height}" loading="lazy" decoding="async" alt="${escapeHtml(alt)}" aria-describedby="${descriptionId}">
     </picture>
     <p class="sr-only" id="${descriptionId}">${escapeHtml(description)}</p>
@@ -133,7 +134,6 @@ function renderHomepageProjects() {
   const moreProject = projects.find((project) => project.home === 'more');
   return `<p class="project-group-label">Featured projects</p>
     <div class="project-features">${featured.map(renderFeaturedProject).join('')}</div>
-    <p class="project-group-label project-group-label--more">More projects</p>
     <div class="project-continuation">
       <article class="project project-more-entry">
         ${renderProjectCopy(moreProject, featured.length, { element: 'a', showStack: false })}

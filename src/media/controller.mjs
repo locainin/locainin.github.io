@@ -12,9 +12,9 @@ export function initMedia(document, browser) {
     const picture = figure.querySelector('picture');
     const image = figure.querySelector('img');
     const button = figure.querySelector('[data-loop-toggle]');
-    const source = figure.querySelector('source');
+    const sources = picture ? picture.querySelectorAll('source') : [];
     // The GIF stays available as the fallback when a browser cannot play VP9
-    const gif = image ? { animation: image.getAttribute('src'), poster: source?.getAttribute('srcset') } : null;
+    const gif = image ? { animation: image.getAttribute('src'), poster: sources[0]?.getAttribute('srcset') } : null;
     const projectVideo = Boolean(video?.hasAttribute('data-project-video') && image);
     const videoSource = projectVideo ? video.getAttribute('src') : null;
     const canPlayProjectVideo = Boolean(projectVideo && videoSource && typeof video.canPlayType === 'function'
@@ -117,7 +117,10 @@ export function initMedia(document, browser) {
       }
     };
     const toggle = () => { requested = paused(); void sync(); };
-    const failedImage = () => { requested = false; pause(); };
+    const failedImage = () => {
+      // A broken poster must not stop a video that can still play
+      if (image.getAttribute('src') === gif.animation) { requested = false; pause(); }
+    };
     const failedProjectVideo = () => {
       // Decode failures fall back to the original GIF with its normal controls
       if (!optimized || !video.hasAttribute('src')) return;
@@ -131,15 +134,15 @@ export function initMedia(document, browser) {
       video.addEventListener('pause', render);
       if (projectVideo) {
         video.hidden = true;
-        if (optimized) showPoster();
-        else releaseProjectVideo();
+        if (!optimized) releaseProjectVideo();
         video.addEventListener('error', failedProjectVideo);
       }
     }
     if (image) {
       image.addEventListener('error', failedImage);
-      // Keep the browser from selecting the motion-sensitive source after JS takes control
-      if (source) source.media = 'not all';
+      // Select the poster before releasing sources so the GIF does not start by accident
+      showPoster();
+      for (const source of sources) source.media = 'not all';
     }
     button.addEventListener('click', toggle);
     button.hidden = false;

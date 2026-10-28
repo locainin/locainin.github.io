@@ -34,7 +34,6 @@
 .stego-demo [data-loop-toggle] { color: var(--muted); min-height: 44px; }
 
 .project-group-label { margin-bottom: 16px; color: var(--metadata); font: 12px/1.7 var(--mono); letter-spacing: .8px; text-transform: uppercase; }
-.project-group-label--more { margin-top: 33px; margin-bottom: 0; }
 
 /* A third project and the archive exit share one clear ending to the section */
 .project-continuation { display: grid; gap: 34px; padding-top: 24px; }
@@ -57,7 +56,7 @@
   .projects-heading h2 { font-size: 39px; }
   .project-copy > p { font-size: 15px; }
   .project-continuation { gap: 24px; }
-  .project-more-entry { grid-template-columns: 1fr; gap: 24px; }
+  .project-more-entry { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .project-directory-link { align-items: flex-start; padding: 23px 0 0; border-top: 1px solid var(--line); text-align: left; }
   .project-directory-link strong { font-size: 26px; }
   .archive-link { gap: 10px; }
