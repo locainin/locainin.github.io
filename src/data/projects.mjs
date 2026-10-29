@@ -1,3 +1,6 @@
+// The capability query includes 4:4:4 RGB and a level 3.1 decoding budget
+export const projectVideoType = 'video/webm; codecs="vp09.01.31.08.03.02.02.00.01"';
+
 // Project records keep repository links and display copy consistent across pages
 export const projects = [
   {
@@ -20,6 +23,7 @@ export const projects = [
     note: '18 seconds inside the least-significant bits.',
     media: {
       animation: 'assets/stego/inplainsight.gif', video: 'assets/stego/inplainsight.webm', poster: 'assets/stego/poster.webp', width: 960, height: 680,
+      type: projectVideoType,
       alt: "A note becomes encrypted data, then tiny changes to an image's RGB channel bits",
       description: 'An 18-second illustration shows a note being packaged and encrypted, a selected channel changing by one level, then the nearly identical image. Example bytes and placement are schematic, not a recording of the complete algorithm.',
       caption: 'there’s something hidden in here. probably.',
@@ -35,6 +39,7 @@ export const projects = [
     home: 'more',
     media: {
       animation: 'assets/proton/protoninformer.gif', video: 'assets/proton/protoninformer.webm', poster: 'assets/proton/poster.webp', width: 720, height: 480,
+      type: projectVideoType,
       alt: 'An illustrated DLL moves through validation and a Wine prefix into a target process',
       description: 'A workflow illustration shows target discovery, DLL architecture checks, a matching Windows helper loading the DLL inside a Wine prefix, and verification of the expected module path. It is a schematic illustration rather than a recording.',
     },

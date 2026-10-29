@@ -1,10 +1,14 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { readFile, rm, writeFile } from 'node:fs/promises';
-import { dirname, relative, sep } from 'node:path';
+import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compile } from 'ripple/compiler';
 import { prerender } from 'ripple/server';
+import { articles } from '../src/data/articles.mjs';
+import { projects } from '../src/data/projects.mjs';
+import { assertSafeOutput } from './content/artifact.mjs';
 import { renderContentMarkers } from './content/render.mjs';
+import { assertNoGeneratedMarkers, validateContent } from './content/validate.mjs';
 
 const component = new URL('../src/terminal/TerminalIntro.tsrx', import.meta.url);
 const theme = new URL('../assets/js/theme.js', import.meta.url);
@@ -30,8 +34,27 @@ async function compileTerminal() {
 }
 
 export function staticHtml() {
+  let routeFiles;
+  let outputDirectory;
+  let wroteBundle = false;
   return {
     name: 'locainin-static-html',
+    configResolved(config) {
+      // Use the resolved inputs so validation follows the routes Vite will build
+      const input = config.build.rolldownOptions.input;
+      routeFiles = Array.isArray(input) ? input : typeof input === 'string' ? [input] : Object.values(input || {});
+      if (config.command === 'build' && config.build.write) outputDirectory = resolve(config.root, config.build.outDir);
+    },
+    async buildStart() {
+      await validateContent({ root: siteRoot, routeFiles, articleRecords: articles, projectRecords: projects });
+    },
+    writeBundle() {
+      wroteBundle = true;
+    },
+    async closeBundle() {
+      // Check the final files after every output hook has finished
+      if (wroteBundle && outputDirectory) await assertSafeOutput(outputDirectory);
+    },
     transformIndexHtml: {
       order: 'pre',
       async handler(html, context) {
@@ -50,13 +73,17 @@ export function staticHtml() {
           // Enforce the policy before browsers see any scripts or resource links
           html = html.replace('<head>', `<head>\n  <meta http-equiv="Content-Security-Policy" content="${policy}">`);
         }
-        if (!html.includes('<!-- terminal-intro -->')) return html;
-        const { TerminalIntro } = context.server
-          ? await context.server.ssrLoadModule('/src/terminal/TerminalIntro.tsrx')
-          : await compileTerminal();
-        const output = await prerender(() => TerminalIntro({ animate: false }));
-        if (output.topLevelError) throw output.topLevelError;
-        return html.replace('<!-- terminal-intro -->', output.body);
+        if (html.includes('<!-- terminal-intro -->')) {
+          const { TerminalIntro } = context.server
+            ? await context.server.ssrLoadModule('/src/terminal/TerminalIntro.tsrx')
+            : await compileTerminal();
+          const output = await prerender(() => TerminalIntro({ animate: false }));
+          if (output.topLevelError) throw output.topLevelError;
+          html = html.replace('<!-- terminal-intro -->', output.body);
+        }
+        // A leftover marker would otherwise publish incomplete page content
+        assertNoGeneratedMarkers(html);
+        return html;
       },
     },
   };

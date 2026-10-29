@@ -29,15 +29,17 @@ function stackLabel(stack = []) {
 
 // Both project animations share playback markup while keeping their own assets
 function renderProjectAnimation(project, rootHref, className) {
-  const { animation, video, poster, width, height, alt, description, caption } = project.media;
+  const { animation, video, type, poster, width, height, alt, description, caption } = project.media;
   const descriptionId = `${project.slug}-description`;
   return `<figure class="${className}" data-media-loop aria-label="${escapeHtml(alt)}" aria-describedby="${descriptionId}">
-    <video data-project-video src="${rootHref}${escapeHtml(video)}" width="${width}" height="${height}" poster="${rootHref}${escapeHtml(poster)}" muted loop playsinline preload="none" hidden aria-hidden="true"></video>
-    <picture>
-      <source media="(prefers-reduced-motion: reduce)" srcset="${rootHref}${escapeHtml(poster)}">
-      <source media="(scripting: enabled)" srcset="${rootHref}${escapeHtml(poster)}">
-      <img src="${rootHref}${escapeHtml(animation)}" width="${width}" height="${height}" loading="lazy" decoding="async" alt="${escapeHtml(alt)}" aria-describedby="${descriptionId}">
-    </picture>
+    <div class="project-media-stage">
+      <video data-project-video data-video-type="${escapeHtml(type)}" src="${rootHref}${escapeHtml(video)}" width="${width}" height="${height}" poster="${rootHref}${escapeHtml(poster)}" muted loop playsinline preload="none" hidden aria-hidden="true"></video>
+      <picture>
+        <source media="(prefers-reduced-motion: reduce)" srcset="${rootHref}${escapeHtml(poster)}">
+        <source media="(scripting: enabled)" srcset="${rootHref}${escapeHtml(poster)}">
+        <img src="${rootHref}${escapeHtml(animation)}" width="${width}" height="${height}" loading="lazy" decoding="async" alt="${escapeHtml(alt)}" aria-describedby="${descriptionId}">
+      </picture>
+    </div>
     <p class="sr-only" id="${descriptionId}">${escapeHtml(description)}</p>
     <figcaption>${caption ? `<span>${escapeHtml(caption)}</span>` : ''}<button type="button" data-loop-toggle hidden>Stop animation</button></figcaption>
   </figure>`;
@@ -193,7 +195,7 @@ function renderProjectFeature(project, index, rootHref) {
 
   return `<article class="project-archive-feature project-archive-feature--stego">
     <figure class="project-archive-poster">
-      <img src="${rootHref}${project.media.poster}" width="960" height="680" loading="lazy" decoding="async" alt="An encrypted container is hidden in small RGB channel changes, leaving the image nearly unchanged">
+      <img src="${rootHref}${escapeHtml(project.media.poster)}" width="${project.media.width}" height="${project.media.height}" loading="lazy" decoding="async" alt="An encrypted container is hidden in small RGB channel changes, leaving the image nearly unchanged">
       <figcaption>INPLAINSIGHT / RGB LSB ILLUSTRATION</figcaption>
     </figure>
     ${info}
@@ -227,13 +229,13 @@ function renderArticleHeader(article, rootHref) {
 
 function renderArticleDetail(article, rootHref) {
   const header = renderArticleHeader(article, rootHref);
+  if (article.status === 'published' && (typeof article.body !== 'string' || !article.body.trim())) {
+    throw new Error(`Published article requires authored body markup: ${article.slug}`);
+  }
   const body = article.status === 'coming-soon'
     ? '<section class="article-placeholder" aria-label="Article status"><p>This article is in progress.</p></section>'
     // Static source markup becomes the article body once writing is ready
     : `<div class="article-body">${article.body}</div>`;
-  if (article.status !== 'coming-soon' && (!article.body || typeof article.body !== 'string')) {
-    throw new Error(`Published article requires authored body markup: ${article.slug}`);
-  }
   return `<article>
     ${header}
     ${body}

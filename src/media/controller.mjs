@@ -18,36 +18,39 @@ export function initMedia(document, browser) {
     const projectVideo = Boolean(video?.hasAttribute('data-project-video') && image);
     const videoSource = projectVideo ? video.getAttribute('src') : null;
     const canPlayProjectVideo = Boolean(projectVideo && videoSource && typeof video.canPlayType === 'function'
-      && video.canPlayType('video/webm; codecs="vp9"'));
+      && video.canPlayType(video.getAttribute('data-video-type') ?? ''));
     const rect = observer ? figure.getBoundingClientRect() : null;
     let inView = !rect || (rect.bottom > 0 && rect.top < browser.innerHeight && rect.right > 0 && rect.left < browser.innerWidth);
     let requested = !preference.matches;
     let active = true;
     let optimized = canPlayProjectVideo;
-    let playPending = false;
+    let state = 'stopped';
+    let firstFrameCallback = null;
     let playbackGeneration = 0;
 
     // Plain videos keep the loop control and pause at their current frame
     const plainVideo = Boolean(video && !projectVideo);
-    const paused = () => plainVideo ? video.paused
-      : optimized ? video.hidden
-        : image.getAttribute('src') !== gif.animation;
     const render = () => {
-      // Labels follow visible playback, including browsers that block autoplay
+      // Loading remains cancellable even while the poster is still covering the video
+      const running = state === 'loading' || state === 'playing';
       button.textContent = plainVideo
-        ? (paused() ? 'Play loop' : 'Pause loop')
-        : (paused() ? 'Play animation' : 'Stop animation');
+        ? (running ? 'Pause loop' : 'Play loop')
+        : (running ? 'Stop animation' : 'Play animation');
     };
     const showPoster = () => {
       if (picture) picture.hidden = false;
       if (image && gif.poster && image.getAttribute('src') !== gif.poster) image.setAttribute('src', gif.poster);
     };
-    const releaseProjectVideo = () => {
-      // Invalidating the request prevents a late play result from revealing released media
+    const invalidatePlayback = () => {
+      // A stopped or replaced startup must never reveal a late decoded frame
       playbackGeneration++;
-      playPending = false;
+      if (firstFrameCallback !== null) {
+        video.cancelVideoFrameCallback(firstFrameCallback);
+        firstFrameCallback = null;
+      }
+    };
+    const releaseProjectVideo = () => {
       video.hidden = true;
-      if (picture) picture.hidden = false;
       video.pause();
       if (video.hasAttribute('src')) {
         video.removeAttribute('src');
@@ -55,6 +58,8 @@ export function initMedia(document, browser) {
       }
     };
     const pause = () => {
+      invalidatePlayback();
+      state = 'stopped';
       if (plainVideo) video.pause();
       else {
         // Removing the source releases the preview while its still poster is visible
@@ -68,55 +73,59 @@ export function initMedia(document, browser) {
         pause();
         return;
       }
-      try {
-        if (plainVideo) {
-          video.muted = true;
-          await video.play();
-        } else if (optimized) {
-          // Visibility notifications can repeat while a preview is already playing
-          if (playPending || (!video.paused && !video.hidden)) {
-            render();
-            return;
-          }
-          // A released preview gets a fresh resource and restarts like the GIF
-          if (!video.hasAttribute('src')) {
-            video.setAttribute('src', videoSource);
-            video.load();
-          }
-          video.hidden = true;
-          video.muted = true;
-
-          const generation = ++playbackGeneration;
-          playPending = true;
-          try {
-            await video.play();
-          } catch {
-            // A rejected play request stays retryable from the visible button
-            if (generation === playbackGeneration) playPending = false;
-            render();
-            return;
-          }
-
-          if (generation !== playbackGeneration) {
-            render();
-            return;
-          }
-          playPending = false;
-          // The GIF remains visible until playback has really started
-          if (active && requested && inView && !document.hidden && optimized && !video.paused) {
-            if (picture) picture.hidden = true;
-            video.hidden = false;
-          }
-        } else if (paused()) image.setAttribute('src', gif.animation);
-
-        // Pending play requests cannot restart media after a visibility transition or disposal
-        if (!active || !requested || !inView || document.hidden) pause();
+      // Repeated observer notifications share the current startup or playback
+      if (state === 'loading' || state === 'playing') return;
+      if (!plainVideo && !optimized) {
+        image.setAttribute('src', gif.animation);
+        state = 'playing';
         render();
+        return;
+      }
+
+      const generation = ++playbackGeneration;
+      state = 'loading';
+      render();
+      if (optimized) {
+        // The grid keeps the poster above a renderable video during startup
+        showPoster();
+        video.hidden = false;
+        if (!video.hasAttribute('src')) {
+          video.setAttribute('src', videoSource);
+          video.load();
+        }
+        if (typeof video.requestVideoFrameCallback === 'function'
+            && typeof video.cancelVideoFrameCallback === 'function') {
+          firstFrameCallback = video.requestVideoFrameCallback(() => {
+            if (generation !== playbackGeneration || state !== 'loading') return;
+            firstFrameCallback = null;
+            picture.hidden = true;
+            state = 'playing';
+            render();
+          });
+        }
+      }
+      video.muted = true;
+      try {
+        await video.play();
+        if (generation !== playbackGeneration) return;
+        // Older browsers hand off after playback starts instead of a frame callback
+        if (!optimized || firstFrameCallback === null) {
+          if (optimized) picture.hidden = true;
+          state = 'playing';
+          render();
+        }
       } catch {
+        if (generation !== playbackGeneration) return;
+        pause();
+        // A blocked request remains retryable rather than acting like a manual stop
+        state = 'blocked';
         render();
       }
     };
-    const toggle = () => { requested = paused(); void sync(); };
+    const toggle = () => {
+      requested = state !== 'loading' && state !== 'playing';
+      void sync();
+    };
     const failedImage = () => {
       // A broken poster must not stop a video that can still play
       if (image.getAttribute('src') === gif.animation) { requested = false; pause(); }
@@ -125,13 +134,20 @@ export function initMedia(document, browser) {
       // Decode failures fall back to the original GIF with its normal controls
       if (!optimized || !video.hasAttribute('src')) return;
       optimized = false;
-      releaseProjectVideo();
+      pause();
       void sync();
+    };
+    const interrupted = () => {
+      // Native playback can pause independently when the browser interrupts media
+      // Ignore queued pause events from a source that has already been restarted
+      if (!video.paused || (state !== 'loading' && state !== 'playing')) return;
+      pause();
+      state = 'blocked';
+      render();
     };
 
     if (video) {
-      video.addEventListener('play', render);
-      video.addEventListener('pause', render);
+      video.addEventListener('pause', interrupted);
       if (projectVideo) {
         video.hidden = true;
         if (!optimized) releaseProjectVideo();
@@ -161,8 +177,7 @@ export function initMedia(document, browser) {
         active = false;
         pause();
         if (video) {
-          video.removeEventListener('play', render);
-          video.removeEventListener('pause', render);
+          video.removeEventListener('pause', interrupted);
           if (projectVideo) video.removeEventListener('error', failedProjectVideo);
         }
         if (image) image.removeEventListener('error', failedImage);

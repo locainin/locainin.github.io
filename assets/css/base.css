@@ -108,3 +108,9 @@ img { display: block; max-width: 100%; height: auto; }
 @media (max-width: 680px), (pointer: coarse) {
   .wordmark { min-height: 44px; }
 }
+
+/* Project previews share a renderable video stage beneath the startup poster */
+.project-media-stage { display: grid; }
+.project-media-stage > :is(video, picture) { grid-area: 1 / 1; }
+/* The poster covers startup without hiding the video from the rendering engine */
+.project-media-stage > picture { position: relative; z-index: 1; }
